@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comparador de Taxas - Stone</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8;
+        }
+        .stone-green {
+            background-color: #00AB4E;
+        }
+        .stone-green-light {
+            background-color: #e6f5ed;
+        }
+        .competitor-blue {
+            background-color: #3b82f6;
+        }
+        .competitor-blue-light {
+            background-color: #ebf3ff;
+        }
+        .input-focus:focus {
+            border-color: #00AB4E;
+            box-shadow: 0 0 0 3px rgba(0, 171, 78, 0.2);
+        }
+        .input-group {
+            position: relative;
+        }
+        .input-group-text {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6b7280;
+            pointer-events: none;
+        }
+        .slider-debit {
+            accent-color: #10B981;
+        }
+        .slider-credit {
+            accent-color: #3B82F6;
+        }
+        .slider-installment {
+            accent-color: #8B5CF6;
+        }
+        .slider-pix {
+            accent-color: #F59E0B;
+        }
+        @media print {
+            .no-print {
+                display: none;
+            }
+            body {
+                background-color: white;
+            }
+            .print-break {
+                page-break-before: always;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="min-h-screen">
+        <!-- Header -->
+        <header class="stone-green text-white py-4 shadow-md no-print">
+            <div class="container mx-auto px-4 flex justify-between items-center">
+                <h1 class="text-2xl font-bold">Comparador de Taxas</h1>
+                <div class="text-sm font-medium">Stone</div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="container mx-auto px-4 py-8">
+            <div class="bg-white rounded-lg shadow-lg p-6 max-w-5xl mx-auto">
+                <h2 class="text-xl font-semibold mb-6 text-gray-800">Compare taxas e serviços</h2>
+                
+                <!-- Client Information -->
+                <div class="bg-gray-50 p-5 rounded-lg mb-6 no-print">
+                    <h3 class="text-lg font-semibold mb-4 text-gray-800">Informações do cliente</h3>
+                    
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Nome do estabelecimento</label>
+                            <input type="text" id="clientName" class="w-full px-3 py-2 border border-gray-300 rounded-md input-focus" placeholder="Ex: Restaurante Silva">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Nome do concorrente</label>
+                            <input type="text" id="competitorName" class="w-full px-3 py-2 border border-gray-300 rounded-md input-focus" placeholder="Ex: Cielo">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Sales History -->
+                <div class="bg-gray-50 p-5 rounded-lg mb-6 no-print">
+                    <h3 class="text-lg font-semibold mb-4 text-gray-800">Histórico de vendas (últimos 30 dias)</h3>
+                    
+                    <div class="grid md:grid-cols-4 gap-4">
+                        <div class="input-group">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Débito (R$)</label>
+                            <input type="text" id="salesDebit" class="w-full px-3 py-2 border border-gray-300 rounded-md input-focus" placeholder="Ex: 5000,00">
+                            <span class="input-group-text">R$</span>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Crédito à vista (R$)</label>
+                            <input type="text" id="salesCredit" class="w-full px-3 py-2 border border-gray-300 rounded-md input-focus" placeholder="Ex: 5000,00">
+                            <span class="input-group-text">R$</span>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Parcelado (R$)</label>
+                            <input type="text" id="salesInstallment" class="w-full px-3 py-2 border border-gray-300 rounded-md input-focus" placeholder="Ex: 5000,00">
+                            <span class="input-group-text">R$</span>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Pix (R$)</label>
+                            <input type="text" id="salesPix" class="w-full px-3 py-2 border border-gray-300 rounded-md input-focus" placeholder="Ex: 5000,00">
+                            <span class="input-group-text">R$</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4 grid md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Número de parcelas médio</label>
+                            <input type="number" id="installments" min="1" max="12" class="w-full px-3 py-2 border border-gray-300 rounded-md input-focus" placeholder="Ex: 3" value="3">
+                        </div>
+                        
+                        <div>
+                            <button id="calculateDistribution" class="mt-6 stone-green text-white px-4 py-2 rounded-md font-medium hover:bg-green-700 transition-colors">
+                                Calcular distribuição
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Input Form -->
+                <div class="grid md:grid-cols-2 gap-6 mb-8 no-print">
+                    <!-- Stone Column -->
+                    <div class="stone-green-light p-5 rounded-lg">
+                        <h3 class="text-lg font-semibold mb-4 text-gray-800 flex items-center">
+                            <div class="w-4 h-4 rounded-full stone-green mr-2"></div>
+                            Stone
+                        </h3>
+                        
+                        <div class="mb-4 input-group">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Taxa de débito</label>
+                            <input type="text" id="stoneDebit" class="w-full px-3 py-2 border border-gray-300 rounded-md input-focus" placeholder="Ex: 1,99">
+                            <span class="input-group-text">%</span>
+                        </div>
+                        
+                        <div class="mb-4 input-group">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Taxa de crédito à vista</label>
+                            <input type="text" id="stoneCredit" class="w-full px-3 py-2 border border-gray-300 rounded-md input-focus" placeholder="Ex: 3,99">
+                            <span class="input-group-text">%</span>
+                        </div>
+                        
+                        <div class="mb-4 input-group">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Taxa de parcelado</label>
+                            <input type="text" id="stoneInstallment" class="w-full px-3 py-2 border border-gray-300 rounded-md input-focus" placeholder="Ex: 4,99">
+                            <span class="input-group-text">%</span>
+                        </div>
+                        
+                        <div class="mb-4 input-group">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Taxa Pix</label>
+                            <input type="text" id="stonePix" class="w-full px-3 py-2 border border-gray-300 rounded-md input-focus" placeholder="Ex: 0,99">
+                            <span class="input-group-text">%</span>
+                        </div>
+                        
+                        <div class="mb-4 input-group">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Taxa de intermediação</label>
+                            <input type="text" id="stoneIntermediation" class="w-full px-3 py-2 border border-gray-300 rounded-md input-focus" placeholder="Ex: 0,00">
+                            <span class="input-group-text">%</span>
+                        </div>
+                        
+                        <div class="mb-4 input-group">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Aluguel da maquininha</label>
+                            <input type="text" id="stoneRental" class="w-full px-3 py-2 border border-gray-300 rounded-md input-focus" placeholder="Ex: 0,00">
+                            <span class="input-group-text">R$</span>
+                        </div>
+                        
+                        <div class="mb-4 input-group">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Antecipação</label>
+                            <input type="text" id="stoneAdvance" class="w-full px-3 py-2 border border-gray-300 rounded-md input-focus" placeholder="Ex: 2,99">
+                            <span class="input-group-text">%</span>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Cesta bancária</label>
+                            <input type="text" id="stoneBanking" class="w-full px-3 py-2 border border-gray-300 rounded-md input-focus" placeholder="Ex: 0,00">
+                            <span class="input-group-text">R$</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Competitor Column -->
+                    <div class="competitor-blue-light p-5 rounded-lg">
+                        <h3 class="text-lg font-semibold mb-4 text-gray-800 flex items-center">
+                            <div class="w-4 h-4 rounded-full competitor-blue mr-2"></div>
+                            Concorrente
+                        </h3>
+                        
+                        <div class="mb-4 input-group">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Taxa de débito</label>
+                            <input type="text" id="compDebit" class="w-full px-3 py-2 border border-gray-300 rounded-md input-focus" placeholder="Ex: 1,99">
+                            <span class="input-group-text">%</span>
+                        </div>
+                        
+                        <div class="mb-4 input-group">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Taxa de crédito à vista</label>
+                            <input type="text" id="compCredit" class="w-full px-3 py-2 border border-gray-300 rounded-md input-focus" placeholder="Ex: 3,99">
+                            <span class="input-group-text">%</span>
+                        </div>
+                        
+                        <div class="mb-4 input-group">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Taxa de parcelado</label>
+                            <input type="text" id="compInstallment" class="w-full px-3 py-2 border border-gray-300 rounded-md input-focus" placeholder="Ex: 4,99">
+                            <span class="input-group-text">%</span>
+                        </div>
+                        
+                        <div class="mb-4 input-group">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Taxa Pix</label>
+                            <input type="text" id="compPix" class="w-full px-3 py-2 border border-gray-300 rounded-md input-focus" placeholder="Ex: 0,99">
+                            <span class="input-group-text">%</span>
+                        </div>
+                        
+                        <div class="mb-4 input-group">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Taxa de intermediação</label>
+                            <input type="text" id="compIntermediation" class="w-full px-3 py-2 border border-gray-300 rounded-md input-focus" placeholder="Ex: 0,00">
+                            <span class="input-group-text">%</span>
+                        </div>
+                        
+                        <div class="mb-4 input-group">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Aluguel da maquininha</label>
+                            <input type="text" id="compRental" class="w-full px-3 py-2 border border-gray-300 rounded-md input-focus" placeholder="Ex: 0,00">
+                            <span class="input-group-text">R$</span>
+                        </div>
+                        
+                        <div class="mb-4 input-group">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Antecipação</label>
+                            <input type="text" id="compAdvance" class="w-full px-3 py-2 border border-gray-300 rounded-md input-focus" placeholder="Ex: 2,99">
+                            <span class="input-group-text">%</span>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Cesta bancária</label>
+                            <input type="text" id="compBanking" class="w-full px-3 py-2 border border-gray-300 rounded-md input-focus" placeholder="Ex: 0,00">
+                            <span class="input-group-text">R$</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Distribution Sliders -->
+                <div class="bg-gray-50 p-5 rounded-lg mb-6 no-print">
+                    <h3 class="text-lg font-semibold mb-4 text-gray-800">Distribuição de vendas</h3>
+                    
+                    <div class="mb-4">
+                        <div class="flex justify-between mb-1">
+                            <label class="text-sm font-medium text-gray-700">Débito: <span id="debitPercentLabel">25</span>%</label>
+                            <span class="text-sm text-gray-500" id="debitValueLabel">R$ 2.500,00</span>
+                        </div>
+                        <input type="range" id="debitPercent" min="0" max="100" value="25" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider-debit">
+                    </div>
+                    
+                    <div class="mb-4">
+                        <div class="flex justify-between mb-1">
+                            <label class="text-sm font-medium text-gray-700">Crédito à vista: <span id="creditPercentLabel">25</span>%</label>
+                            <span class="text-sm text-gray-500" id="creditValueLabel">R$ 2.500,00</span>
+                        </div>
+                        <input type="range" id="creditPercent" min="0" max="100" value="25" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider-credit">
+                    </div>
+                    
+                    <div class="mb-4">
+                        <div class="flex justify-between mb-1">
+                            <label class="text-sm font-medium text-gray-700">Parcelado: <span id="installmentPercentLabel">25</span>%</label>
+                            <span class="text-sm text-gray-500" id="installmentValueLabel">R$ 2.500,00</span>
+                        </div>
+                        <input type="range" id="installmentPercent" min="0" max="100" value="25" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider-installment">
+                    </div>
+                    
+                    <div class="mb-4">
+                        <div class="flex justify-between mb-1">
+                            <label class="text-sm font-medium text-gray-700">Pix: <span id="pixPercentLabel">25</span>%</label>
+                            <span class="text-sm text-gray-500" id="pixValueLabel">R$ 2.500,00</span>
+                        </div>
+                        <input type="range" id="pixPercent" min="0" max="100" value="25" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider-pix">
+                    </div>
+                    
+                    <div class="flex justify-between items-center mt-2">
+                        <div class="text-sm text-gray-700">Total: <span id="totalPercentLabel" class="font-medium">100</span>%</div>
+                        <button id="balanceDistribution" class="text-sm bg-gray-200 hover:bg-gray-300 text-gray-700 px-3 py-1 rounded-md transition-colors">
+                            Ajustar para 100%
+                        </button>
+                    </div>
+                    
+                    <div class="mt-4 input-group">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Valor médio mensal</label>
+                        <input type="text" id="monthlyValue" class="w-full px-3 py-2 border border-gray-300 rounded-md input-focus" placeholder="Ex: 10.000,00" value="10000">
+                        <span class="input-group-text">R$</span>
+                    </div>
+                </div>
+                
+                <div class="flex justify-center no-print">
+                    <button id="compareButton" class="stone-green text-white px-6 py-3 rounded-md font-medium hover:bg-green-700 transition-colors">
+                        Comparar taxas
+                    </button>
+                </div>
+                
+                <!-- Results Section (Hidden by default) -->
+                <div id="resultsSection" class="mt-8 hidden">
+                    <!-- Print Header -->
+                    <div class="hidden print:block mb-8">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <h1 class="text-2xl font-bold text-gray-800">Comparativo de Taxas</h1>
+                                <p class="text-gray-600" id="printClientName"></p>
+                            </div>
+                            <div class="text-right">
+                                <p class="font-medium text-gray-800">Data: <span id="printDate"></span></p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h2 class="text-xl font-semibold mb-6 text-gray-800">Resultado da comparação</h2>
+                    
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <!-- Stone Results -->
+                        <div class="stone-green-light p-5 rounded-lg">
+                            <h3 class="text-lg font-semibold mb-4 text-gray-800 flex items-center">
+                                <div class="w-4 h-4 rounded-full stone-green mr-2"></div>
+                                Stone
+                            </h3>
+                            
+                            <div class="space-y-3">
+                                <div class="flex justify-between">
+                                    <span class="text-sm text-gray-600">Custo débito:</span>
+                                    <span class="font-medium" id="stoneDebitCost">R$ 0,00</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-sm text-gray-600">Custo crédito à vista:</span>
+                                    <span class="font-medium" id="stoneCreditCost">R$ 0,00</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-sm text-gray-600">Custo parcelado:</span>
+                                    <span class="font-medium" id="stoneInstallmentCost">R$ 0,00</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-sm text-gray-600">Custo Pix:</span>
+                                    <span class="font-medium" id="stonePixCost">R$ 0,00</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-sm text-gray-600">Custo intermediação:</span>
+                                    <span class="font-medium" id="stoneIntermediationCost">R$ 0,00</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-sm text-gray-600">Custo aluguel:</span>
+                                    <span class="font-medium" id="stoneRentalCost">R$ 0,00</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-sm text-gray-600">Custo antecipação:</span>
+                                    <span class="font-medium" id="stoneAdvanceCost">R$ 0,00</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-sm text-gray-600">Cesta bancária:</span>
+                                    <span class="font-medium" id="stoneBankingCost">R$ 0,00</span>
+                                </div>
+                                <div class="border-t pt-2 mt-2 flex justify-between">
+                                    <span class="font-semibold">Custo total:</span>
+                                    <span class="font-bold text-lg" id="stoneTotalCost">R$ 0,00</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-sm text-gray-600">Taxa efetiva:</span>
+                                    <span class="font-medium" id="stoneEffectiveRate">0,00%</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Competitor Results -->
+                        <div class="competitor-blue-light p-5 rounded-lg">
+                            <h3 class="text-lg font-semibold mb-4 text-gray-800 flex items-center">
+                                <div class="w-4 h-4 rounded-full competitor-blue mr-2"></div>
+                                <span id="competitorNameDisplay">Concorrente</span>
+                            </h3>
+                            
+                            <div class="space-y-3">
+                                <div class="flex justify-between">
+                                    <span class="text-sm text-gray-600">Custo débito:</span>
+                                    <span class="font-medium" id="compDebitCost">R$ 0,00</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-sm text-gray-600">Custo crédito à vista:</span>
+                                    <span class="font-medium" id="compCreditCost">R$ 0,00</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-sm text-gray-600">Custo parcelado:</span>
+                                    <span class="font-medium" id="compInstallmentCost">R$ 0,00</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-sm text-gray-600">Custo Pix:</span>
+                                    <span class="font-medium" id="compPixCost">R$ 0,00</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-sm text-gray-600">Custo intermediação:</span>
+                                    <span class="font-medium" id="compIntermediationCost">R$ 0,00</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-sm text-gray-600">Custo aluguel:</span>
+                                    <span class="font-medium" id="compRentalCost">R$ 0,00</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-sm text-gray-600">Custo antecipação:</span>
+                                    <span class="font-medium" id="compAdvanceCost">R$ 0,00</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-sm text-gray-600">Cesta bancária:</span>
+                                    <span class="font-medium" id="compBankingCost">R$ 0,00</span>
+                                </div>
+                                <div class="border-t pt-2 mt-2 flex justify-between">
+                                    <span class="font-semibold">Custo total:</span>
+                                    <span class="font-bold text-lg" id="compTotalCost">R$ 0,00</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-sm text-gray-600">Taxa efetiva:</span>
+                                    <span class="font-medium" id="compEffectiveRate">0,00%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Comparison Summary -->
+                    <div class="mt-6 p-5 rounded-lg bg-gray-50">
+                        <h3 class="text-lg font-semibold mb-4 text-gray-800">Resumo da comparação</h3>
+                        
+                        <div id="comparisonResult" class="text-center p-4 rounded-lg font-bold text-lg">
+                            <!-- Will be filled by JavaScript -->
+                        </div>
+                        
+                        <div class="mt-4 grid md:grid-cols-2 gap-4">
+                            <div>
+                                <div class="text-sm text-gray-600 mb-1">Economia mensal com a Stone:</div>
+                                <div class="font-bold text-xl" id="monthlySavings">R$ 0,00</div>
+                            </div>
+                            <div>
+                                <div class="text-sm text-gray-600 mb-1">Economia anual com a Stone:</div>
+                                <div class="font-bold text-xl" id="annualSavings">R$ 0,00</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Distribution Chart -->
+                    <div class="mt-6 p-5 rounded-lg bg-gray-50">
+                        <h3 class="text-lg font-semibold mb-4 text-gray-800">Distribuição de vendas</h3>
+                        
+                        <div class="grid grid-cols-4 gap-2">
+                            <div class="text-center">
+                                <div class="bg-green-100 p-3 rounded-lg">
+                                    <div class="text-sm text-gray-600">Débito</div>
+                                    <div class="font-bold text-lg" id="chartDebitPercent">25%</div>
+                                    <div class="text-sm font-medium" id="chartDebitValue">R$ 2.500,00</div>
+                                </div>
+                            </div>
+                            <div class="text-center">
+                                <div class="bg-blue-100 p-3 rounded-lg">
+                                    <div class="text-sm text-gray-600">Crédito à vista</div>
+                                    <div class="font-bold text-lg" id="chartCreditPercent">25%</div>
+                                    <div class="text-sm font-medium" id="chartCreditValue">R$ 2.500,00</div>
+                                </div>
+                            </div>
+                            <div class="text-center">
+                                <div class="bg-purple-100 p-3 rounded-lg">
+                                    <div class="text-sm text-gray-600">Parcelado</div>
+                                    <div class="font-bold text-lg" id="chartInstallmentPercent">25%</div>
+                                    <div class="text-sm font-medium" id="chartInstallmentValue">R$ 2.500,00</div>
+                                </div>
+                            </div>
+                            <div class="text-center">
+                                <div class="bg-yellow-100 p-3 rounded-lg">
+                                    <div class="text-sm text-gray-600">Pix</div>
+                                    <div class="font-bold text-lg" id="chartPixPercent">25%</div>
+                                    <div class="text-sm font-medium" id="chartPixValue">R$ 2.500,00</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Export Options -->
+                    <div class="mt-6 flex justify-center no-print">
+                        <button id="printButton" class="bg-gray-800 text-white px-6 py-3 rounded-md font-medium hover:bg-gray-700 transition-colors">
+                            Imprimir comparativo
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+        
+        <footer class="bg-gray-800 text-white py-4 mt-12 no-print">
+            <div class="container mx-auto px-4 text-center text-sm">
+                Comparador de Taxas Stone - Desenvolvido para equipe comercial
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Initialize distribution sliders
+        const debitSlider = document.getElementById('debitPercent');
+        const creditSlider = document.getElementById('creditPercent');
+        const installmentSlider = document.getElementById('installmentPercent');
+        const pixSlider = document.getElementById('pixPercent');
+        const monthlyValueInput = document.getElementById('monthlyValue');
+        
+        // Helper function to parse Brazilian number format
+        function parseLocalizedNumber(value) {
+            if (!value) return 0;
+            return parseFloat(value.replace(/\./g, '').replace(',', '.'));
+        }
+        
+        // Helper function to format number to Brazilian format
+        function formatLocalizedNumber(value) {
+            return value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+        
+        // Update distribution labels and check total
+        function updateDistributionLabels() {
+            const debitPercent = parseInt(debitSlider.value);
+            const creditPercent = parseInt(creditSlider.value);
+            const installmentPercent = parseInt(installmentSlider.value);
+            const pixPercent = parseInt(pixSlider.value);
+            const total = debitPercent + creditPercent + installmentPercent + pixPercent;
+            const monthlyValue = parseLocalizedNumber(monthlyValueInput.value) || 0;
+            
+            // Update percentage labels
+            document.getElementById('debitPercentLabel').textContent = debitPercent;
+            document.getElementById('creditPercentLabel').textContent = creditPercent;
+            document.getElementById('installmentPercentLabel').textContent = installmentPercent;
+            document.getElementById('pixPercentLabel').textContent = pixPercent;
+            document.getElementById('totalPercentLabel').textContent = total;
+            
+            // Update value labels
+            document.getElementById('debitValueLabel').textContent = formatCurrency(monthlyValue * debitPercent / 100);
+            document.getElementById('creditValueLabel').textContent = formatCurrency(monthlyValue * creditPercent / 100);
+            document.getElementById('installmentValueLabel').textContent = formatCurrency(monthlyValue * installmentPercent / 100);
+            document.getElementById('pixValueLabel').textContent = formatCurrency(monthlyValue * pixPercent / 100);
+            
+            // Highlight if total is not 100%
+            const totalLabel = document.getElementById('totalPercentLabel');
+            if (total === 100) {
+                totalLabel.classList.remove('text-red-600');
+                totalLabel.classList.add('text-green-600');
+            } else {
+                totalLabel.classList.remove('text-green-600');
+                totalLabel.classList.add('text-red-600');
+            }
+        }
+        
+        // Balance distribution to ensure total is 100%
+        function balanceDistribution() {
+            const debitPercent = parseInt(debitSlider.value);
+            const creditPercent = parseInt(creditSlider.value);
+            const installmentPercent = parseInt(installmentSlider.value);
+            const pixPercent = parseInt(pixSlider.value);
+            
+            const total = debitPercent + creditPercent + installmentPercent + pixPercent;
+            
+            if (total === 100) {
+                return; // Already balanced
+            }
+            
+            // Calculate adjustment factor
+            const factor = 100 / total;
+            
+            // Adjust values proportionally
+            let newDebit = Math.round(debitPercent * factor);
+            let newCredit = Math.round(creditPercent * factor);
+            let newInstallment = Math.round(installmentPercent * factor);
+            let newPix = Math.round(pixPercent * factor);
+            
+            // Ensure total is exactly 100%
+            let newTotal = newDebit + newCredit + newInstallment + newPix;
+            if (newTotal !== 100) {
+                // Adjust the largest value to make total exactly 100%
+                const values = [
+                    { id: 'debitPercent', value: newDebit },
+                    { id: 'creditPercent', value: newCredit },
+                    { id: 'installmentPercent', value: newInstallment },
+                    { id: 'pixPercent', value: newPix }
+                ];
+                
+                values.sort((a, b) => b.value - a.value);
+                values[0].value += (100 - newTotal);
+                
+                // Update values
+                values.forEach(item => {
+                    document.getElementById(item.id).value = item.value;
+                });
+            } else {
+                // Update sliders with new values
+                debitSlider.value = newDebit;
+                creditSlider.value = newCredit;
+                installmentSlider.value = newInstallment;
+                pixSlider.value = newPix;
+            }
+            
+            updateDistributionLabels();
+        }
+        
+        // Add event listeners for sliders
+        debitSlider.addEventListener('input', updateDistributionLabels);
+        creditSlider.addEventListener('input', updateDistributionLabels);
+        installmentSlider.addEventListener('input', updateDistributionLabels);
+        pixSlider.addEventListener('input', updateDistributionLabels);
+        monthlyValueInput.addEventListener('input', updateDistributionLabels);
+        
+        // Add event listener for balance button
+        document.getElementById('balanceDistribution').addEventListener('click', balanceDistribution);
+        
+        // Calculate distribution from sales history
+        document.getElementById('calculateDistribution').addEventListener('click', function() {
+            const salesDebit = parseLocalizedNumber(document.getElementById('salesDebit').value) || 0;
+            const salesCredit = parseLocalizedNumber(document.getElementById('salesCredit').value) || 0;
+            const salesInstallment = parseLocalizedNumber(document.getElementById('salesInstallment').value) || 0;
+            const salesPix = parseLocalizedNumber(document.getElementById('salesPix').value) || 0;
+            
+            const totalSales = salesDebit + salesCredit + salesInstallment + salesPix;
+            
+            if (totalSales > 0) {
+                // Calculate percentages based on actual values
+                const debitPercent = Math.round((salesDebit / totalSales) * 100);
+                const creditPercent = Math.round((salesCredit / totalSales) * 100);
+                const installmentPercent = Math.round((salesInstallment / totalSales) * 100);
+                
+                // Calculate Pix as the remainder to ensure total is 100%
+                let pixPercent = 100 - (debitPercent + creditPercent + installmentPercent);
+                
+                // Handle edge cases where rounding might cause pixPercent to be negative
+                if (pixPercent < 0) {
+                    // Redistribute to ensure all values are positive and sum to 100%
+                    let totalPositive = 0;
+                    let positiveCount = 0;
+                    
+                    if (debitPercent > 0) { totalPositive += debitPercent; positiveCount++; }
+                    if (creditPercent > 0) { totalPositive += creditPercent; positiveCount++; }
+                    if (installmentPercent > 0) { totalPositive += installmentPercent; positiveCount++; }
+                    
+                    // Reduce each positive value proportionally
+                    const reduction = -pixPercent / positiveCount;
+                    
+                    if (debitPercent > 0) debitPercent = Math.max(1, Math.round(debitPercent - reduction));
+                    if (creditPercent > 0) creditPercent = Math.max(1, Math.round(creditPercent - reduction));
+                    if (installmentPercent > 0) installmentPercent = Math.max(1, Math.round(installmentPercent - reduction));
+                    
+                    // Recalculate pixPercent
+                    pixPercent = 100 - (debitPercent + creditPercent + installmentPercent);
+                }
+                
+                // Update sliders
+                debitSlider.value = debitPercent;
+                creditSlider.value = creditPercent;
+                installmentSlider.value = installmentPercent;
+                pixSlider.value = pixPercent;
+                
+                // Update monthly value
+                monthlyValueInput.value = formatLocalizedNumber(totalSales);
+                
+                // Update labels
+                updateDistributionLabels();
+                
+                alert('Distribuição calculada com sucesso!');
+            } else {
+                alert('Por favor, insira valores de vendas válidos.');
+            }
+        });
+        
+        // Format currency function
+        function formatCurrency(value) {
+            return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
+        }
+        
+        // Compare button click handler
+        document.getElementById('compareButton').addEventListener('click', function() {
+            // Get all input values
+            const stoneDebit = parseLocalizedNumber(document.getElementById('stoneDebit').value) || 0;
+            const stoneCredit = parseLocalizedNumber(document.getElementById('stoneCredit').value) || 0;
+            const stoneInstallment = parseLocalizedNumber(document.getElementById('stoneInstallment').value) || 0;
+            const stonePix = parseLocalizedNumber(document.getElementById('stonePix').value) || 0;
+            const stoneIntermediation = parseLocalizedNumber(document.getElementById('stoneIntermediation').value) || 0;
+            const stoneRental = parseLocalizedNumber(document.getElementById('stoneRental').value) || 0;
+            const stoneAdvance = parseLocalizedNumber(document.getElementById('stoneAdvance').value) || 0;
+            const stoneBanking = parseLocalizedNumber(document.getElementById('stoneBanking').value) || 0;
+            
+            const compDebit = parseLocalizedNumber(document.getElementById('compDebit').value) || 0;
+            const compCredit = parseLocalizedNumber(document.getElementById('compCredit').value) || 0;
+            const compInstallment = parseLocalizedNumber(document.getElementById('compInstallment').value) || 0;
+            const compPix = parseLocalizedNumber(document.getElementById('compPix').value) || 0;
+            const compIntermediation = parseLocalizedNumber(document.getElementById('compIntermediation').value) || 0;
+            const compRental = parseLocalizedNumber(document.getElementById('compRental').value) || 0;
+            const compAdvance = parseLocalizedNumber(document.getElementById('compAdvance').value) || 0;
+            const compBanking = parseLocalizedNumber(document.getElementById('compBanking').value) || 0;
+            
+            const monthlyValue = parseLocalizedNumber(document.getElementById('monthlyValue').value) || 0;
+            const installments = parseInt(document.getElementById('installments').value) || 1;
+            const competitorName = document.getElementById('competitorName').value || 'Concorrente';
+            const clientName = document.getElementById('clientName').value || 'Cliente';
+            
+            const debitPercent = parseInt(debitSlider.value) / 100;
+            const creditPercent = parseInt(creditSlider.value) / 100;
+            const installmentPercent = parseInt(installmentSlider.value) / 100;
+            const pixPercent = parseInt(pixSlider.value) / 100;
+            
+            // Check if distribution adds up to 100%
+            const totalPercent = (debitPercent + creditPercent + installmentPercent + pixPercent) * 100;
+            if (Math.abs(totalPercent - 100) > 0.01) {
+                alert('A distribuição de vendas deve somar 100%. Por favor, ajuste os valores ou clique em "Ajustar para 100%".');
+                return;
+            }
+            
+            // Calculate costs for Stone
+            const stoneDebitCost = monthlyValue * debitPercent * (stoneDebit / 100);
+            const stoneCreditCost = monthlyValue * creditPercent * (stoneCredit / 100);
+            const stoneInstallmentCost = monthlyValue * installmentPercent * (stoneInstallment / 100) * installments;
+            const stonePixCost = monthlyValue * pixPercent * (stonePix / 100);
+            const stoneIntermediationCost = monthlyValue * (stoneIntermediation / 100);
+            const stoneAdvanceCost = (stoneCreditCost + stoneInstallmentCost) * (stoneAdvance / 100);
+            const stoneTotalCost = stoneDebitCost + stoneCreditCost + stoneInstallmentCost + stonePixCost + stoneIntermediationCost + stoneRental + stoneAdvanceCost + stoneBanking;
+            const stoneEffectiveRate = (stoneTotalCost / monthlyValue) * 100;
+            
+            // Calculate costs for competitor
+            const compDebitCost = monthlyValue * debitPercent * (compDebit / 100);
+            const compCreditCost = monthlyValue * creditPercent * (compCredit / 100);
+            const compInstallmentCost = monthlyValue * installmentPercent * (compInstallment / 100) * installments;
+            const compPixCost = monthlyValue * pixPercent * (compPix / 100);
+            const compIntermediationCost = monthlyValue * (compIntermediation / 100);
+            const compAdvanceCost = (compCreditCost + compInstallmentCost) * (compAdvance / 100);
+            const compTotalCost = compDebitCost + compCreditCost + compInstallmentCost + compPixCost + compIntermediationCost + compRental + compAdvanceCost + compBanking;
+            const compEffectiveRate = (compTotalCost / monthlyValue) * 100;
+            
+            // Update results
+            document.getElementById('stoneDebitCost').textContent = formatCurrency(stoneDebitCost);
+            document.getElementById('stoneCreditCost').textContent = formatCurrency(stoneCreditCost);
+            document.getElementById('stoneInstallmentCost').textContent = formatCurrency(stoneInstallmentCost);
+            document.getElementById('stonePixCost').textContent = formatCurrency(stonePixCost);
+            document.getElementById('stoneIntermediationCost').textContent = formatCurrency(stoneIntermediationCost);
+            document.getElementById('stoneRentalCost').textContent = formatCurrency(stoneRental);
+            document.getElementById('stoneAdvanceCost').textContent = formatCurrency(stoneAdvanceCost);
+            document.getElementById('stoneBankingCost').textContent = formatCurrency(stoneBanking);
+            document.getElementById('stoneTotalCost').textContent = formatCurrency(stoneTotalCost);
+            document.getElementById('stoneEffectiveRate').textContent = stoneEffectiveRate.toFixed(2) + '%';
+            
+            document.getElementById('compDebitCost').textContent = formatCurrency(compDebitCost);
+            document.getElementById('compCreditCost').textContent = formatCurrency(compCreditCost);
+            document.getElementById('compInstallmentCost').textContent = formatCurrency(compInstallmentCost);
+            document.getElementById('compPixCost').textContent = formatCurrency(compPixCost);
+            document.getElementById('compIntermediationCost').textContent = formatCurrency(compIntermediationCost);
+            document.getElementById('compRentalCost').textContent = formatCurrency(compRental);
+            document.getElementById('compAdvanceCost').textContent = formatCurrency(compAdvanceCost);
+            document.getElementById('compBankingCost').textContent = formatCurrency(compBanking);
+            document.getElementById('compTotalCost').textContent = formatCurrency(compTotalCost);
+            document.getElementById('compEffectiveRate').textContent = compEffectiveRate.toFixed(2) + '%';
+            
+            // Update competitor name
+            document.getElementById('competitorNameDisplay').textContent = competitorName;
+            
+            // Calculate savings
+            const monthlySavings = compTotalCost - stoneTotalCost;
+            const annualSavings = monthlySavings * 12;
+            
+            document.getElementById('monthlySavings').textContent = formatCurrency(monthlySavings);
+            document.getElementById('annualSavings').textContent = formatCurrency(annualSavings);
+            
+            // Show comparison result
+            const comparisonResult = document.getElementById('comparisonResult');
+            if (stoneTotalCost < compTotalCost) {
+                comparisonResult.textContent = `A Stone é ${((compTotalCost / stoneTotalCost - 1) * 100).toFixed(2)}% mais econômica que ${competitorName}`;
+                comparisonResult.className = 'text-center p-4 rounded-lg font-bold text-lg bg-green-100 text-green-800';
+            } else if (stoneTotalCost > compTotalCost) {
+                comparisonResult.textContent = `${competitorName} é ${((stoneTotalCost / compTotalCost - 1) * 100).toFixed(2)}% mais econômica que a Stone`;
+                comparisonResult.className = 'text-center p-4 rounded-lg font-bold text-lg bg-red-100 text-red-800';
+            } else {
+                comparisonResult.textContent = `A Stone e ${competitorName} têm o mesmo custo total`;
+                comparisonResult.className = 'text-center p-4 rounded-lg font-bold text-lg bg-gray-100 text-gray-800';
+            }
+            
+            // Update distribution chart
+            document.getElementById('chartDebitPercent').textContent = `${parseInt(debitSlider.value)}%`;
+            document.getElementById('chartCreditPercent').textContent = `${parseInt(creditSlider.value)}%`;
+            document.getElementById('chartInstallmentPercent').textContent = `${parseInt(installmentSlider.value)}%`;
+            document.getElementById('chartPixPercent').textContent = `${parseInt(pixSlider.value)}%`;
+            
+            document.getElementById('chartDebitValue').textContent = formatCurrency(monthlyValue * debitPercent);
+            document.getElementById('chartCreditValue').textContent = formatCurrency(monthlyValue * creditPercent);
+            document.getElementById('chartInstallmentValue').textContent = formatCurrency(monthlyValue * installmentPercent);
+            document.getElementById('chartPixValue').textContent = formatCurrency(monthlyValue * pixPercent);
+            
+            // Update print information
+            document.getElementById('printClientName').textContent = clientName;
+            const today = new Date();
+            document.getElementById('printDate').textContent = today.toLocaleDateString('pt-BR');
+            
+            // Show results section
+            document.getElementById('resultsSection').classList.remove('hidden');
+        });
+        
+        // Print button handler
+        document.getElementById('printButton').addEventListener('click', function() {
+            window.print();
+        });
+        
+        // Format input values on blur
+        const percentInputs = document.querySelectorAll('input[id$="Debit"], input[id$="Credit"], input[id$="Installment"], input[id$="Pix"], input[id$="Advance"], input[id$="Intermediation"]');
+        percentInputs.forEach(input => {
+            input.addEventListener('blur', function() {
+                const value = parseLocalizedNumber(this.value);
+                if (!isNaN(value)) {
+                    this.value = formatLocalizedNumber(value);
+                }
+            });
+        });
+        
+        const moneyInputs = document.querySelectorAll('input[id$="Rental"], input[id$="Banking"], input[id^="sales"], input[id="monthlyValue"]');
+        moneyInputs.forEach(input => {
+            input.addEventListener('blur', function() {
+                const value = parseLocalizedNumber(this.value);
+                if (!isNaN(value)) {
+                    this.value = formatLocalizedNumber(value);
+                }
+            });
+        });
+        
+        // Initialize distribution labels
+        updateDistributionLabels();
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'962733bfe66c1308',t:'MTc1MzA2NDI0OC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
